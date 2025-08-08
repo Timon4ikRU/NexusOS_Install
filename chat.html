@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TestOS Community Chat</title>
+    <style>
+        body {
+            font-family: 'Google Sans Code', sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 20px;
+            transition: background-color 0.3s;
+        }
+        body.dark-mode {
+            background-color: #121212;
+            color: #e0e0e0;
+        }
+        .chat-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            padding: 20px;
+        }
+        body.dark-mode .chat-container {
+            background: #1e1e1e;
+        }
+        #messages {
+            height: 400px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+        body.dark-mode #messages {
+            border-color: #444;
+        }
+        #messageInput {
+            width: calc(100% - 70px);
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        button {
+            padding: 10px 15px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <button class="theme-toggle">🌓</button>
+    <div class="chat-container">
+        <h1>TestOS Community 🍻</h1>
+        <div id="messages"></div>
+        <input type="text" id="messageInput" placeholder="Ваше сообщение...">
+        <button onclick="sendMessage()">Отправить</button>
+    </div>
+
+    <script>
+        // Тёмная тема
+        document.querySelector('.theme-toggle').addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+        });
+
+        // Логин
+        let username = localStorage.getItem('testos_username') || prompt("Введите ваш ник:") || "Аноним";
+        localStorage.setItem('testos_username', username);
+
+        // Загрузка сообщений
+        function loadMessages() {
+            let messages = JSON.parse(localStorage.getItem('testos_chat')) || [];
+            messages.forEach(msg => {
+                document.getElementById('messages').innerHTML += `<p><b>${msg.user}:</b> ${msg.text}</p>`;
+            });
+        }
+
+        // Отправка сообщения
+        function sendMessage() {
+            let input = document.getElementById('messageInput');
+            let text = input.value.trim();
+            if (!text) return;
+
+            let messages = JSON.parse(localStorage.getItem('testos_chat')) || [];
+            messages.push({ user: username, text: text });
+            localStorage.setItem('testos_chat', JSON.stringify(messages));
+
+            document.getElementById('messages').innerHTML += `<p><b>${username}:</b> ${text}</p>`;
+            input.value = '';
+        }
+
+        // Инициализация
+        loadMessages();
+        document.getElementById('messageInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
+    </script>
+</body>
+</html>
